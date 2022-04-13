@@ -8,7 +8,10 @@ INCLUDEPATH += Include
 
 SOURCES += \
     Source/Algorithms.cpp \
-    Source/SearchSystem.cpp
+    Source/SearchSystem.cpp \
+    Source/SearchSystemContainer.cpp
 
 HEADERS += \
-    Include/Algorithms.h
+    Include/Algorithms.h \
+    Include/Def.h \
+    Include/SearchSystemContainer.h

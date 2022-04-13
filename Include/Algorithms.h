@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace Algorithms
 {
@@ -21,5 +22,12 @@ namespace Algorithms
          * \return число
          */
         static int ReadLineWithNumber();
+
+        /*!
+         * \brief SplitIntoWords Разбор строки по словам
+         * \param text строка
+         * \return слова
+         */
+        static std::vector<std::string> SplitIntoWords(const std::string& text);
     };
 }
