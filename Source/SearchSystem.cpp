@@ -8,20 +8,18 @@
 
 int main()
 {
-    using namespace Algorithms;
-
     // инициализация по умолчанию
     auto container = std::make_unique<SearchSystemContainer>();
 
-    //container->InitializeStopWords(Algorthms::ReadLine());
+    //container->InitializeStopWords(Algorithms::Algorithms::ReadLine());
 	
     // Чтение документов
-    //    const int document_count = Algorthms::ReadLineWithNumber();
+    //    const int document_count = Algorithms::Algorithms::ReadLineWithNumber();
     //    container->ClearDocuments();
     //    for (int id = 0; id < document_count; ++id)
-    //        container->AddDocument(Algorthms::SplitIntoWords(Algorthms::ReadLine()));
+    //        container->AddDocument(Algorthms::SplitIntoWords(Algorithms::Algorithms::ReadLine()));
 
-    //auto query = Algorthms::SplitIntoWords(Algorthms::ReadLine());
+    //auto query = Algorthms::SplitIntoWords(Algorithms::Algorithms::ReadLine());
     auto query = std::vector<std::string>{"cheburashka", "with", "big", "ears", "likes", "oranges"};
     for (auto [document_id, relevance] : container->FindDocuments(query))
         std::cout << "{ document_id = " << document_id << ", relevance = " << relevance << " }" << std::endl;
