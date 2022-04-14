@@ -4,14 +4,14 @@
 
 namespace Algorithms
 {
-    std::string Algorthms::ReadLine()
+    std::string Algorithms::ReadLine()
     {
         std::string res;
         std::getline(std::cin, res);
         return res;
     }
 
-    int Algorthms::ReadLineWithNumber()
+    int Algorithms::ReadLineWithNumber()
     {
         int res{0};
         std::cin >> res;
@@ -19,7 +19,7 @@ namespace Algorithms
         return res;
     }
 
-    std::vector<std::string> Algorthms::SplitIntoWords(const std::string &text)
+    std::vector<std::string> Algorithms::SplitIntoWords(const std::string &text)
     {
         std::vector<std::string> words;
         std::string word;

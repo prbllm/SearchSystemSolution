@@ -8,7 +8,7 @@ namespace Algorithms
     /*!
      * \brief The Algorthms class Алгоритмы
      */
-    class Algorthms final
+    class Algorithms final
     {
     public:
         /*!

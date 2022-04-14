@@ -1,7 +1,9 @@
 #pragma once
 
+#include <memory>
 #include <set>
 #include <string>
+#include <vector>
 
 // Self
 #include <Def.h>
@@ -11,6 +13,7 @@
  */
 class SearchSystemContainer final
 {
+    using Documents = std::vector<std::pair<int, std::vector<std::string>>>;
 public:
     /*!
      * \brief SearchSystemContainer Конструктор
@@ -46,9 +49,78 @@ public:
      */
     void InitializeStopWords(std::set<std::string>&& words);
 
-private:
     /*!
-     * \brief _stopWords Запрещённые слова
+     * \brief GetDocuments Получение документов
+     * \return документы
      */
-    std::set<std::string> _stopWords;
+    NO_DISCARD const Documents& GetDocuments() const;
+
+    /*!
+     * \brief InitializeDocuments Инициализация документов
+     * \param docs документы
+     */
+    void InitializeDocuments(const Documents& docs);
+
+    /*!
+     * \brief InitializeDocuments Инициализация документов
+     * \param docs документы
+     */
+    void InitializeDocuments(Documents&& docs);
+
+    /*!
+     * \brief AddDocument Добавление документа
+     * \param docs документы
+     */
+    void AddDocument(const std::vector<std::string>& doc);
+
+    /*!
+     * \brief AddDocument Добавление документа
+     * \param docs документы
+     */
+    void AddDocument(std::vector<std::string>&& doc);
+
+    /*!
+     * \brief ClearDocuments Очищение документов
+     */
+    void ClearDocuments();
+
+    /*!
+     * \brief FindDocuments Поиск документов
+     * \param query поисковая строка
+     * \return результат поиска в формате уникальный идентификатор документа - релевантность
+     */
+    NO_DISCARD std::vector<std::pair<int, int>> FindDocuments(const std::string& query);
+
+    /*!
+     * \brief FindDocuments Поиск документов
+     * \param query поисковая строка
+     * \return результат поиска в формате уникальный идентификатор документа - релевантность
+     */
+    NO_DISCARD std::vector<std::pair<int, int>> FindDocuments(const std::vector<std::string>& query);
+
+private:
+
+    /*!
+     * \brief Данные
+     */
+    struct Data;
+
+    /*!
+     * \brief _data Данные
+     */
+    std::unique_ptr<Data> _data;
+
+    /*!
+     * \brief CheckStopWords Изменение слов с учётом запрещённых
+     * \param words слова
+     */
+    void CheckStopWords(std::vector<std::string>& words);
+
+    /*!
+     * \brief MatchDocuments Определение релевантности документа
+     * \param doc документ
+     * \param queryUnique уникальные слова запроса
+     * \return релевантность
+     */
+    int MatchDocument(const std::pair<int, std::vector<std::string>>& doc, const std::set<std::string>& queryUnique);
 };
