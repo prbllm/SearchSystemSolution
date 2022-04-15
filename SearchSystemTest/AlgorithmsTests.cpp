@@ -13,9 +13,10 @@ TEST(AlgorithmsTests, SplitIntoWordsTest)
 
 TEST(AlgorithmsTests, CountStartsWithTest)
 {
+    EXPECT_EQ(0, Algorithms::Algorithms::CountStartsWith(std::vector<std::string>{"asd", "dsa", "zxc"}, 'c'));
+    EXPECT_EQ(0, Algorithms::Algorithms::CountStartsWith(std::vector<std::string>{}, 'c'));
     EXPECT_EQ(1, Algorithms::Algorithms::CountStartsWith(std::vector<std::string>{"asd", "dsa", "zxc"}, 'a'));
     EXPECT_EQ(3, Algorithms::Algorithms::CountStartsWith(std::vector<std::string>{"dasd", "dsa", "d"}, 'd'));
-    EXPECT_EQ(0, Algorithms::Algorithms::CountStartsWith(std::vector<std::string>{"asd", "dsa", "zxc"}, 'c'));
 }
 
 TEST(AlgorithmsTests, CCalculateMedianTest)

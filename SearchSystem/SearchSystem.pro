@@ -15,3 +15,5 @@ HEADERS += \
     Include/Algorithms.h \
     Include/Def.h \
     Include/SearchSystemContainer.h
+
+LIBS += -ltbb

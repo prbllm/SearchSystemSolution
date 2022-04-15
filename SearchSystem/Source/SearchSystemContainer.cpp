@@ -4,6 +4,7 @@
 #include "Algorithms.h"
 
 #include <algorithm>
+#include <execution>
 
 struct SearchSystemContainer::Data
 {
@@ -115,11 +116,21 @@ std::vector<std::pair<int, int> > SearchSystemContainer::FindDocuments(const std
     result.reserve(_data->documents.size());
 
     for (const auto& doc : _data->documents)
-    {
-        if (auto rel = MatchDocument(doc, queryUnique); rel > 0)
-            result.push_back(std::make_pair(doc.first, rel));
-    }
+        result.emplace_back(std::make_pair(doc.first, MatchDocument(doc, queryUnique)));
     return result;
+}
+
+std::vector<std::pair<int, int> > SearchSystemContainer::FindTopDocuments(const std::vector<std::string> &query, size_t count)
+{
+    auto res = FindDocuments(query);
+    std::sort(std::execution::par, res.begin(), res.end(),[](const std::pair<int, int> &a, const std::pair<int, int> &b)
+    {
+        return a.second > b.second;
+    });
+
+    if (count < res.size())
+        return std::vector<std::pair<int, int>>{res.begin(), res.begin() + count};
+    return res;
 }
 
 void SearchSystemContainer::CheckStopWords(std::vector<std::string> &words)

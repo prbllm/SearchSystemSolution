@@ -98,6 +98,14 @@ public:
      */
     NO_DISCARD std::vector<std::pair<int, int>> FindDocuments(const std::vector<std::string>& query);
 
+    /*!
+     * \brief FindTopDocuments Поиск документов с высокой релевантностью
+     * \param query запрос
+     * \param count количество документов
+     * \return результат поиска в формате уникальный идентификатор документа - релевантность
+     */
+    NO_DISCARD std::vector<std::pair<int, int>> FindTopDocuments(const std::vector<std::string>& query, size_t count);
+
 private:
 
     /*!
