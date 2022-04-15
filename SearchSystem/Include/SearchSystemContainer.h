@@ -75,12 +75,6 @@ public:
     void AddDocument(const std::vector<std::string>& doc);
 
     /*!
-     * \brief AddDocument Добавление документа
-     * \param docs документы
-     */
-    void AddDocument(std::vector<std::string>&& doc);
-
-    /*!
      * \brief ClearDocuments Очищение документов
      */
     void ClearDocuments();
@@ -90,14 +84,14 @@ public:
      * \param query поисковая строка
      * \return результат поиска в формате уникальный идентификатор документа - релевантность
      */
-    NO_DISCARD std::vector<Document> FindDocuments(const std::string& query);
+    NO_DISCARD std::vector<Document> FindDocuments(const std::string& query) const;
 
     /*!
      * \brief FindDocuments Поиск документов
      * \param query поисковая строка
      * \return результат поиска в формате уникальный идентификатор документа - релевантность
      */
-    NO_DISCARD std::vector<Document> FindDocuments(const std::vector<std::string>& query);
+    NO_DISCARD std::vector<Document> FindDocuments(const std::vector<std::string>& query) const;
 
     /*!
      * \brief FindTopDocuments Поиск документов с высокой релевантностью
@@ -123,7 +117,7 @@ private:
      * \brief CheckStopWords Изменение слов с учётом запрещённых
      * \param words слова
      */
-    void CheckStopWords(std::vector<std::string>& words);
+    void CheckStopWords(std::vector<std::string>& words) const;
 
     /*!
      * \brief MatchDocuments Определение релевантности документа
@@ -131,5 +125,5 @@ private:
      * \param queryUnique уникальные слова запроса
      * \return релевантность
      */
-    size_t MatchDocument(const std::pair<int, std::vector<std::string>>& doc, const std::set<std::string>& queryUnique);
+    size_t MatchDocument(const std::pair<int, std::vector<std::string>>& doc, const std::set<std::string>& queryUnique) const;
 };
