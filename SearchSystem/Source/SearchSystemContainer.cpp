@@ -21,7 +21,7 @@ struct SearchSystemContainer::Data
     /*!
      * \brief documents Документы
      */
-    std::vector<std::pair<int, std::vector<std::string>>> documents;
+    std::vector<std::pair<size_t, std::vector<std::string>>> documents;
 };
 
 SearchSystemContainer::SearchSystemContainer()
@@ -101,35 +101,35 @@ void SearchSystemContainer::ClearDocuments()
     _data->documents.clear();
 }
 
-std::vector<std::pair<int, int> > SearchSystemContainer::FindDocuments(const std::string &query)
+std::vector<Document> SearchSystemContainer::FindDocuments(const std::string &query)
 {
     return FindDocuments(Algorithms::Algorithms::SplitIntoWords(query));
 }
 
-std::vector<std::pair<int, int> > SearchSystemContainer::FindDocuments(const std::vector<std::string> &query)
+std::vector<Document> SearchSystemContainer::FindDocuments(const std::vector<std::string> &query)
 {
     auto resultQuery = query;
     CheckStopWords(resultQuery);
     auto queryUnique = std::set<std::string>{resultQuery.begin(), resultQuery.end()};
 
-    std::vector<std::pair<int, int>> result;
+    std::vector<Document> result;
     result.reserve(_data->documents.size());
 
     for (const auto& doc : _data->documents)
-        result.emplace_back(std::make_pair(doc.first, MatchDocument(doc, queryUnique)));
+        result.emplace_back(Document{doc.first, MatchDocument(doc, queryUnique)});
     return result;
 }
 
-std::vector<std::pair<int, int> > SearchSystemContainer::FindTopDocuments(const std::vector<std::string> &query, size_t count)
+std::vector<Document> SearchSystemContainer::FindTopDocuments(const std::vector<std::string> &query, size_t count)
 {
     auto res = FindDocuments(query);
-    std::sort(std::execution::par, res.begin(), res.end(),[](const std::pair<int, int> &a, const std::pair<int, int> &b)
+    std::sort(std::execution::par, res.begin(), res.end(),[](const Document &a, const Document &b)
     {
-        return a.second > b.second;
+        return a.relevance > b.relevance;
     });
 
     if (count < res.size())
-        return std::vector<std::pair<int, int>>{res.begin(), res.begin() + count};
+        return std::vector<Document>{res.begin(), res.begin() + count};
     return res;
 }
 
@@ -141,7 +141,7 @@ void SearchSystemContainer::CheckStopWords(std::vector<std::string> &words)
     }), words.end());
 }
 
-int SearchSystemContainer::MatchDocument(const std::pair<int, std::vector<std::string> > &doc, const std::set<std::string> &queryUnique)
+size_t SearchSystemContainer::MatchDocument(const std::pair<int, std::vector<std::string> > &doc, const std::set<std::string> &queryUnique)
 {
     return std::count_if(queryUnique.begin(), queryUnique.end(), [&doc = std::as_const(doc)](const std::string& word)
     {

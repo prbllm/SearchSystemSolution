@@ -7,13 +7,14 @@
 
 // Self
 #include <Def.h>
+#include "Document.h"
 
 /*!
  * \brief The SearchSystemContainer class Контейнер для поисковой системы
  */
 class SearchSystemContainer final
 {
-    using Documents = std::vector<std::pair<int, std::vector<std::string>>>;
+    using Documents = std::vector<std::pair<size_t, std::vector<std::string>>>;
 public:
     /*!
      * \brief SearchSystemContainer Конструктор
@@ -89,14 +90,14 @@ public:
      * \param query поисковая строка
      * \return результат поиска в формате уникальный идентификатор документа - релевантность
      */
-    NO_DISCARD std::vector<std::pair<int, int>> FindDocuments(const std::string& query);
+    NO_DISCARD std::vector<Document> FindDocuments(const std::string& query);
 
     /*!
      * \brief FindDocuments Поиск документов
      * \param query поисковая строка
      * \return результат поиска в формате уникальный идентификатор документа - релевантность
      */
-    NO_DISCARD std::vector<std::pair<int, int>> FindDocuments(const std::vector<std::string>& query);
+    NO_DISCARD std::vector<Document> FindDocuments(const std::vector<std::string>& query);
 
     /*!
      * \brief FindTopDocuments Поиск документов с высокой релевантностью
@@ -104,7 +105,7 @@ public:
      * \param count количество документов
      * \return результат поиска в формате уникальный идентификатор документа - релевантность
      */
-    NO_DISCARD std::vector<std::pair<int, int>> FindTopDocuments(const std::vector<std::string>& query, size_t count);
+    NO_DISCARD std::vector<Document> FindTopDocuments(const std::vector<std::string>& query, size_t count);
 
 private:
 
@@ -130,5 +131,5 @@ private:
      * \param queryUnique уникальные слова запроса
      * \return релевантность
      */
-    int MatchDocument(const std::pair<int, std::vector<std::string>>& doc, const std::set<std::string>& queryUnique);
+    size_t MatchDocument(const std::pair<int, std::vector<std::string>>& doc, const std::set<std::string>& queryUnique);
 };
