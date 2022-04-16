@@ -88,4 +88,15 @@ namespace Algorithms
             return TransformStringToCase(a, true) < TransformStringToCase(b, true);
         });
     }
+
+    size_t Algorithms::ContainWordCount(const std::vector<std::string> &data, const std::string &word)
+    {
+        if (data.empty() || word.empty())
+            return 0;
+
+        return std::count_if(std::execution::par, data.cbegin(), data.cend(), [&word = std::as_const(word)](const std::string& wordData)
+        {
+            return wordData.find(word) != std::string::npos;
+        });
+    }
 }

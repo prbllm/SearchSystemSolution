@@ -47,3 +47,10 @@ TEST(AlgorithmsTests, LexicographicalSortingTest)
     Algorithms::Algorithms::LexicographicalSorting(res);
     EXPECT_EQ(res, (std::vector<std::string>{"AMOUNT", "quantity", "Search", "Selection"}));
 }
+
+TEST(AlgorithmsTests, ContainWordCountTest)
+{
+    auto res = Algorithms::Algorithms::ContainWordCount(std::vector<std::string>{"apple juice ", "bionic beaver", "funny little beaver"}
+                                                        , "beaver");
+    EXPECT_EQ(2, static_cast<int>(res));
+}

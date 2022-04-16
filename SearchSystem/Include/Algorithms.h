@@ -60,5 +60,13 @@ namespace Algorithms
          * \param vec сортируемый массив
          */
         static void LexicographicalSorting(std::vector<std::string>& vec);
+
+        /*!
+         * \brief ContainWordCount Подсчёт количества данных, содержащее искомое слово
+         * \param data данные
+         * \param word слово
+         * \return количество
+         */
+        NO_DISCARD static size_t ContainWordCount(const std::vector<std::string>& data, const std::string& word);
     };
 }
