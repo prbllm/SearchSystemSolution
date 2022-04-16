@@ -47,5 +47,18 @@ namespace Algorithms
          * \return медиана (true - если есть)
          */
         NO_DISCARD static std::pair<bool, double> CalculateMedian(const std::vector<double>& samples);
+
+        /*!
+         * \brief TransformStringToCase Трансформация строки в нужный регистр
+         * \param str строка
+         * \return трансформированная строка
+         */
+        NO_DISCARD static std::string TransformStringToCase(std::string str, bool lower);
+
+        /*!
+         * \brief LexicographicalSorting Лексикографическая сортировка
+         * \param vec сортируемый массив
+         */
+        static void LexicographicalSorting(std::vector<std::string>& vec);
     };
 }

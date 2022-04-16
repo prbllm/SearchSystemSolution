@@ -14,3 +14,5 @@ SOURCES += \
 
 HEADERS += \
     ../SearchSystem/Include/Algorithms.h
+
+LIBS += -ltbb
