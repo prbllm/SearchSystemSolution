@@ -9,10 +9,13 @@ INCLUDEPATH += "../SearchSystem/Include"
 
 SOURCES += \
         ../SearchSystem/Source/Algorithms.cpp \
+        ../SearchSystem/Source/SearchSystemContainer.cpp \
         AlgorithmsTests.cpp \
+        SearchSystemContainerTest.cpp \
         main.cpp        
 
 HEADERS += \
-    ../SearchSystem/Include/Algorithms.h
+    ../SearchSystem/Include/Algorithms.h \
+    ../SearchSystem/Include/SearchSystemContainer.h
 
 LIBS += -ltbb

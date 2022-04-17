@@ -14,7 +14,7 @@ SOURCES += \
 HEADERS += \
     Include/Algorithms.h \
     Include/Def.h \
-    Include/Document.h \
-    Include/SearchSystemContainer.h
+    Include/SearchSystemContainer.h \
+    Include/Structures.h
 
 LIBS += -ltbb

@@ -7,7 +7,7 @@
 
 // Self
 #include <Def.h>
-#include "Document.h"
+#include "Structures.h"
 
 /*!
  * \brief The SearchSystemContainer class Контейнер для поисковой системы
@@ -89,9 +89,10 @@ public:
     /*!
      * \brief FindDocuments Поиск документов
      * \param query поисковая строка
+     * \param all все документы
      * \return результат поиска в формате уникальный идентификатор документа - релевантность
      */
-    NO_DISCARD std::vector<Document> FindDocuments(const std::vector<std::string>& query) const;
+    NO_DISCARD std::vector<Document> FindDocuments(const std::vector<std::string>& query, bool all = false) const;
 
     /*!
      * \brief FindTopDocuments Поиск документов с высокой релевантностью
@@ -120,10 +121,24 @@ private:
     void CheckStopWords(std::vector<std::string>& words) const;
 
     /*!
+     * \brief CreateUniqueWords Создание уникальных слов
+     * \param words изначальный массив слов
+     * \return уникальный массив слов
+     */
+    std::set<std::string> CreateUniqueWords(const std::vector<std::string>& words) const;
+
+    /*!
      * \brief MatchDocuments Определение релевантности документа
      * \param doc документ
-     * \param queryUnique уникальные слова запроса
+     * \param query слова запроса
      * \return релевантность
      */
-    size_t MatchDocument(const std::pair<int, std::vector<std::string>>& doc, const std::set<std::string>& queryUnique) const;
+    NO_DISCARD size_t MatchDocument(const std::pair<int, std::vector<std::string>>& doc, const Query& query) const;
+
+    /*!
+     * \brief ParseQuery Разбор запроса
+     * \param query запрос
+     * \return запрос
+     */
+    NO_DISCARD Query ParseQuery(std::vector<std::string> query) const;
 };

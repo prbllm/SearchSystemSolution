@@ -21,6 +21,6 @@ int main()
 
     //auto query = Algorithms::Algorithms::SplitIntoWords(Algorithms::Algorithms::ReadLine());
     auto query = std::vector<std::string>{"cheburashka", "with", "big", "ears", "likes", "oranges"};
-    for (const auto& doc : container->FindTopDocuments(query, 5))
+    for (const auto& doc : container->FindTopDocuments(query, 0))
         std::cout << "{ document_id = " << doc.id << ", relevance = " << doc.relevance << " }" << std::endl;
 }
