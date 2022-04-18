@@ -113,8 +113,8 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsTest)
 {
     auto query = std::vector<std::string>{"cheburashka", "with", "big", "ears", "likes", "oranges"};
 
-    std::vector<Document> resultFull{Document{0, 0}, Document{1, 0}, Document{2, 1}, Document{3, 2}};
-    std::vector<Document> result{Document{2, 1}, Document{3, 2}};
+    std::vector<Document> resultFull{Document{0, 0.}, Document{1, 0.}, Document{2, 0.198042}, Document{3, 0.346574}};
+    std::vector<Document> result{Document{2, 0.198042051}, Document{3, 0.346574}};
 
     auto resF = _container->FindDocuments(query);
     ASSERT_EQ(result.size(), resF.size());
@@ -122,7 +122,7 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsTest)
     for (size_t i{0}; i < resF.size(); ++i)
     {
         EXPECT_EQ(result[i].id, resF[i].id);
-        EXPECT_EQ(result[i].relevance, resF[i].relevance);
+        EXPECT_NEAR(result[i].relevance, resF[i].relevance, 0.0001);
     }
 
     resF = _container->FindDocuments("cheburashka with big ears likes oranges");
@@ -131,7 +131,7 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsTest)
     for (size_t i{0}; i < resF.size(); ++i)
     {
         EXPECT_EQ(result[i].id, resF[i].id);
-        EXPECT_EQ(result[i].relevance, resF[i].relevance);
+        EXPECT_NEAR(result[i].relevance, resF[i].relevance, 0.0001);
     }
 
     resF = _container->FindDocuments(query, true);
@@ -140,13 +140,13 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsTest)
     for (size_t i{0}; i < resF.size(); ++i)
     {
         EXPECT_EQ(resultFull[i].id, resF[i].id);
-        EXPECT_EQ(resultFull[i].relevance, resF[i].relevance);
+        EXPECT_NEAR(resultFull[i].relevance, resF[i].relevance, 0.0001);
     }
 }
 
 TEST_F(SearchSystemContainerTest, SearchSystemContainerFindTopDocumentsTest)
 {
-    std::vector<Document> result{Document{3, 2}, Document{2, 1}, Document{0, 0}, Document{1, 0}};
+    std::vector<Document> result{Document{3, 0.346574}, Document{2, 0.198042}, Document{0, 0.}, Document{1, 0.}};
     auto query = std::vector<std::string>{"cheburashka", "with", "big", "ears", "likes", "oranges"};
 
     auto resF = _container->FindTopDocuments(query, 0);
@@ -156,9 +156,7 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindTopDocumentsTest)
     ASSERT_EQ(3, resF.size());
 
     for (size_t i{0}; i < resF.size(); ++i)
-    {
-        EXPECT_EQ(result[i].relevance, resF[i].relevance);
-    }
+        EXPECT_NEAR(result[i].relevance, resF[i].relevance, 0.0001);
 }
 
 TEST_F(SearchSystemContainerTest, SearchSystemContainerFindTopDocumentsWithMinusWordsTest)
@@ -170,13 +168,13 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindTopDocumentsWithMinus
     _container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"});
 
     auto resF = _container->FindDocuments(std::vector<std::string>{"пушистый", "ухоженный", "кот", "-ошейник"});
-    std::vector<Document> result{Document{1, 2}, Document{2, 1}};
+    std::vector<Document> result{Document{1, 0.650672}, Document{2, 0.274653}};
 
     ASSERT_EQ(result.size(), resF.size());
 
     for (size_t i{0}; i < resF.size(); ++i)
     {
         EXPECT_EQ(result[i].id, resF[i].id);
-        EXPECT_EQ(result[i].relevance, resF[i].relevance);
+        EXPECT_NEAR(result[i].relevance, resF[i].relevance, 0.0001);
     }
 }

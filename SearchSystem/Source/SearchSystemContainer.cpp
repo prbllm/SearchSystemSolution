@@ -4,6 +4,7 @@
 #include "Algorithms.h"
 
 #include <algorithm>
+#include <cmath>
 #include <execution>
 
 struct SearchSystemContainer::Data
@@ -168,15 +169,21 @@ std::set<std::string> SearchSystemContainer::CreateUniqueWords(const std::vector
     return res;
 }
 
-size_t SearchSystemContainer::MatchDocument(const std::pair<int, std::vector<std::string> > &doc, const Query& queryUnique) const
+double SearchSystemContainer::MatchDocument(const std::pair<int, std::vector<std::string> > &doc, const Query& queryUnique) const
 {
-    return std::count_if(queryUnique.words.begin(), queryUnique.words.end(), [&doc = std::as_const(doc)](const std::string& word)
+    // релевантоность документа рассчитаем по формуле - суммируем значение tf * idf для каждого слова в запросе
+    // tf - term frequency - доля слова в документе (сколько данное слово встречается в документе делённое на общее количество слов)
+    if (queryUnique.words.size() != queryUnique.idf.size())
+        return 0.;
+
+    double sum{0.};
+    for (size_t i{0}; i < queryUnique.words.size(); ++i)
     {
-        auto it = std::find(doc.second.begin(), doc.second.end(), word);
-        if (it != doc.second.end())
-            return true;
-        return false;
-    });
+        auto count = std::count(std::execution::par, doc.second.begin(), doc.second.end(), queryUnique.words[i]);
+        sum += static_cast<double>(count) / static_cast<double>(doc.second.size()) * queryUnique.idf[i];
+    }
+
+    return sum;
 }
 
 Query SearchSystemContainer::ParseQuery(std::vector<std::string> query) const
@@ -190,7 +197,28 @@ Query SearchSystemContainer::ParseQuery(std::vector<std::string> query) const
         return false;
     });
 
-    res.words = CreateUniqueWords(std::vector<std::string>{query.begin(), it});
+    res.words = std::vector<std::string>{query.begin(), it};
+    CheckStopWords(res.words);
+
+    res.idf.reserve(res.words.size());
+    for (const auto& word : res.words)
+    {
+        // рассчитываем idf по формуле - натуральный логарифм от количества документов делённых на количество докуметов, где встречается слово
+        auto count = std::count_if(std::execution::par, _data->documents.begin(), _data->documents.end(),
+                                   [&word = std::as_const(word)](const std::pair<int, std::vector<std::string>>& doc)
+        {
+            auto it = std::find(std::execution::par, doc.second.begin(), doc.second.end(), word);
+            if (it != doc.second.end())
+                return true;
+            return false;
+        });
+        if (!count)
+        {
+            res.idf.emplace_back(0.);
+            continue;
+        }
+        res.idf.emplace_back(std::log(static_cast<double>(_data->documents.size()) / static_cast<double>(count)));
+    }
 
     auto temp = std::vector<std::string>{it, query.end()};
     std::transform(std::execution::par, temp.begin(), temp.end(), temp.begin(),[](const std::string& word)

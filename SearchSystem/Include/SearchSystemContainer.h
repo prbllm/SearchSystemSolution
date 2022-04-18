@@ -133,7 +133,7 @@ private:
      * \param query слова запроса
      * \return релевантность
      */
-    NO_DISCARD size_t MatchDocument(const std::pair<int, std::vector<std::string>>& doc, const Query& query) const;
+    NO_DISCARD double MatchDocument(const std::pair<int, std::vector<std::string>>& doc, const Query& query) const;
 
     /*!
      * \brief ParseQuery Разбор запроса
