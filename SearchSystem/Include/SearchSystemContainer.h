@@ -71,8 +71,9 @@ public:
     /*!
      * \brief AddDocument Добавление документа
      * \param docs документы
+     * \param marks оценки
      */
-    void AddDocument(const std::vector<std::string>& doc);
+    void AddDocument(const std::vector<std::string>& doc, const std::vector<int>& marks);
 
     /*!
      * \brief ClearDocuments Очищение документов

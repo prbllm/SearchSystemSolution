@@ -105,7 +105,7 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerInitializeDocumentsTest)
     EXPECT_EQ(_container->GetDocuments(), res);
 
      res.emplace_back(std::make_pair(2, std::vector<std::string>{"already", "started!"}));
-    _container->AddDocument(std::vector<std::string>{"already", "started!"});
+     _container->AddDocument(std::vector<std::string>{"already", "started!"}, std::vector<int>{});
     EXPECT_EQ(_container->GetDocuments(), res);
 }
 
@@ -159,13 +159,13 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindTopDocumentsTest)
         EXPECT_NEAR(result[i].relevance, resF[i].relevance, 0.0001);
 }
 
-TEST_F(SearchSystemContainerTest, SearchSystemContainerFindTopDocumentsWithMinusWordsTest)
+TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsWithMinusWordsTest)
 {
     _container->InitializeStopWords(std::set<std::string>{"и", "в", "на"});
     _container->ClearDocuments();
-    _container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"});
-    _container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"});
-    _container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"});
+    _container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"}, std::vector<int>{2, 8, -3});
+    _container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"}, std::vector<int>{3, 7, 2, 7});
+    _container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"}, std::vector<int>{4, 5, -12, 2, 1});
 
     auto resF = _container->FindDocuments(std::vector<std::string>{"пушистый", "ухоженный", "кот", "-ошейник"});
     std::vector<Document> result{Document{1, 0.650672}, Document{2, 0.274653}};
@@ -176,5 +176,26 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindTopDocumentsWithMinus
     {
         EXPECT_EQ(result[i].id, resF[i].id);
         EXPECT_NEAR(result[i].relevance, resF[i].relevance, 0.0001);
+    }
+}
+
+TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsRating)
+{
+    _container->InitializeStopWords(std::set<std::string>{"и", "в", "на"});
+    _container->ClearDocuments();
+    _container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"}, std::vector<int>{2, 8, -3});
+    _container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"}, std::vector<int>{3, 7, 2, 7});
+    _container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"}, std::vector<int>{4, 5, -12, 2, 1});
+
+    auto resF = _container->FindTopDocuments(std::vector<std::string>{"пушистый", "ухоженный", "кот"}, 3);
+    std::vector<Document> result{Document{1, 0.650672, 5}, Document{2, 0.274653, 0}, Document{0, 0.101366, 2}};
+
+    ASSERT_EQ(result.size(), resF.size());
+
+    for (size_t i{0}; i < resF.size(); ++i)
+    {
+        EXPECT_EQ(result[i].id, resF[i].id);
+        EXPECT_NEAR(result[i].relevance, resF[i].relevance, 0.0001);
+        EXPECT_EQ(result[i].rating, resF[i].rating);
     }
 }

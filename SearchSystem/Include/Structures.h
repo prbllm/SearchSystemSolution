@@ -18,6 +18,11 @@ struct Document
      * \brief relevance релевантность документа
      */
     double relevance{0.};
+
+    /*!
+     * \brief rating рейтинг документа
+     */
+    int rating{0};
 };
 
 struct Query

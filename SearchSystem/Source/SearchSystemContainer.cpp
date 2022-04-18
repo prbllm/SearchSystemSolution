@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cmath>
 #include <execution>
+#include <map>
 
 struct SearchSystemContainer::Data
 {
@@ -23,6 +24,11 @@ struct SearchSystemContainer::Data
      * \brief documents Документы
      */
     std::vector<std::pair<size_t, std::vector<std::string>>> documents;
+
+    /*!
+     * \brief ratings Рейтинги документов
+     */
+    std::map<size_t, int> ratings;
 };
 
 SearchSystemContainer::SearchSystemContainer()
@@ -90,11 +96,24 @@ void SearchSystemContainer::InitializeDocuments(Documents &&docs)
     _data->documents = docs;
 }
 
-void SearchSystemContainer::AddDocument(const std::vector<std::string> &doc)
+void SearchSystemContainer::AddDocument(const std::vector<std::string> &doc, const std::vector<int>& marks)
 {
     auto res = doc;
     CheckStopWords(res);
-    _data->documents.push_back(std::make_pair(_data->documents.size(), std::move(res)));
+
+    auto docToAdd = std::make_pair(_data->documents.size(), std::move(res));
+
+    if (!marks.size())
+    {
+        _data->ratings.emplace(docToAdd.first, 0);
+    }
+    else
+    {
+        auto summ = std::accumulate(marks.begin(), marks.end(), 0.);
+        _data->ratings.emplace(docToAdd.first, std::round(summ / marks.size()));
+    }
+
+    _data->documents.emplace_back(std::move(docToAdd));
 }
 
 void SearchSystemContainer::ClearDocuments()
@@ -114,12 +133,21 @@ std::vector<Document> SearchSystemContainer::FindDocuments(const std::vector<std
     std::vector<Document> result;
     result.reserve(_data->documents.size());
 
+    int rating{0};
     for (const auto& doc : _data->documents)
     {
+        {
+            auto it = _data->ratings.find(doc.first);
+            if (it != _data->ratings.end())
+                rating = it->second;
+            else
+                rating = 0;
+        }
+
         auto rel = MatchDocument(doc, resultQuery);
         if (all)
         {
-            result.emplace_back(Document{doc.first, rel});
+            result.emplace_back(Document{doc.first, rel, rating});
             continue;
         }
 
@@ -133,7 +161,7 @@ std::vector<Document> SearchSystemContainer::FindDocuments(const std::vector<std
         });
         if (it != doc.second.end())
             continue;
-        result.emplace_back(Document{doc.first, rel});
+        result.emplace_back(Document{doc.first, rel, rating});
     }
     return result;
 }

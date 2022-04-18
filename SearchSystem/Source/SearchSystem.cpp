@@ -13,9 +13,9 @@ int main()
 
     container->InitializeStopWords(std::set<std::string>{"и", "в", "на"});
     container->ClearDocuments();
-    container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"});
-    container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"});
-    container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"});
+    container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"}, std::vector<int>{2, 8, -3});
+    container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"}, std::vector<int>{3, 7, 2, 7});
+    container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"}, std::vector<int>{4, 5, -12, 2, 1});
 
     //container->InitializeStopWords(Algorithms::Algorithms::ReadLine());
 	
@@ -29,5 +29,5 @@ int main()
    // auto query = std::vector<std::string>{"cheburashka", "with", "big", "ears", "likes", "oranges"};
    // for (const auto& doc : container->FindTopDocuments(query, 0))
     for (const auto& doc : container->FindTopDocuments(std::vector<std::string>{"пушистый", "ухоженный", "кот"}, 5))
-        std::cout << "{ document_id = " << doc.id << ", relevance = " << doc.relevance << " }" << std::endl;
+        std::cout << "{ document_id = " << doc.id << ", relevance = " << doc.relevance << ", rating = " << doc.rating << " }" << std::endl;
 }
