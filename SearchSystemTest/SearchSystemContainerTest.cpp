@@ -105,7 +105,7 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerInitializeDocumentsTest)
     EXPECT_EQ(_container->GetDocuments(), res);
 
      res.emplace_back(std::make_pair(2, std::vector<std::string>{"already", "started!"}));
-     _container->AddDocument(std::vector<std::string>{"already", "started!"}, std::vector<int>{});
+     _container->AddDocument(std::vector<std::string>{"already", "started!"}, DocumentStatus::ACTUAL, std::vector<int>{});
     EXPECT_EQ(_container->GetDocuments(), res);
 }
 
@@ -116,7 +116,7 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsTest)
     std::vector<Document> resultFull{Document{0, 0.}, Document{1, 0.}, Document{2, 0.198042}, Document{3, 0.346574}};
     std::vector<Document> result{Document{2, 0.198042051}, Document{3, 0.346574}};
 
-    auto resF = _container->FindDocuments(query);
+    auto resF = _container->FindDocuments(query, DocumentStatus::ACTUAL);
     ASSERT_EQ(result.size(), resF.size());
 
     for (size_t i{0}; i < resF.size(); ++i)
@@ -125,7 +125,7 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsTest)
         EXPECT_NEAR(result[i].relevance, resF[i].relevance, 0.0001);
     }
 
-    resF = _container->FindDocuments("cheburashka with big ears likes oranges");
+    resF = _container->FindDocuments("cheburashka with big ears likes oranges", DocumentStatus::ACTUAL);
     ASSERT_EQ(result.size(), resF.size());
 
     for (size_t i{0}; i < resF.size(); ++i)
@@ -134,7 +134,7 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsTest)
         EXPECT_NEAR(result[i].relevance, resF[i].relevance, 0.0001);
     }
 
-    resF = _container->FindDocuments(query, true);
+    resF = _container->FindDocuments(query, DocumentStatus::ACTUAL, true);
     ASSERT_EQ(resultFull.size(), resF.size());
 
     for (size_t i{0}; i < resF.size(); ++i)
@@ -149,25 +149,60 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindTopDocumentsTest)
     std::vector<Document> result{Document{3, 0.346574}, Document{2, 0.198042}, Document{0, 0.}, Document{1, 0.}};
     auto query = std::vector<std::string>{"cheburashka", "with", "big", "ears", "likes", "oranges"};
 
-    auto resF = _container->FindTopDocuments(query, 0);
+    auto resF = _container->FindTopDocuments(query, DocumentStatus::ACTUAL, 0);
     ASSERT_EQ(0, resF.size());
 
-    resF = _container->FindTopDocuments(query, 3);
+    resF = _container->FindTopDocuments(query, DocumentStatus::ACTUAL, 3);
     ASSERT_EQ(3, resF.size());
 
     for (size_t i{0}; i < resF.size(); ++i)
         EXPECT_NEAR(result[i].relevance, resF[i].relevance, 0.0001);
 }
 
+TEST_F(SearchSystemContainerTest, SearchSystemContainerFindTopDocumentsStatusTest)
+{
+    _container->InitializeStopWords(std::set<std::string>{"и", "в", "на"});
+    _container->ClearDocuments();
+    _container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"}, DocumentStatus::ACTUAL, std::vector<int>{8, -3});
+    _container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"}, DocumentStatus::ACTUAL, std::vector<int>{7, 2, 7});
+    _container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"}, DocumentStatus::ACTUAL, std::vector<int>{5, -12, 2, 1});
+    _container->AddDocument(std::vector<std::string>{"ухоженный", "скворец", "евгений"}, DocumentStatus::BANNED, std::vector<int>{9});
+
+     std::vector<Document> result1{
+         Document{1, 0.866434, 5, DocumentStatus::ACTUAL}
+         , Document{0, 0.173287, 3, DocumentStatus::ACTUAL}
+         , Document{2, 0.173287, -1, DocumentStatus::ACTUAL}};
+     std::vector<Document> result2{Document{3, 0.231049, 9, DocumentStatus::BANNED}};
+
+    auto res = _container->FindTopDocuments("пушистый ухоженный кот");
+    ASSERT_EQ(3, res.size());
+
+    for (size_t i{0}; i < res.size(); ++i)
+    {
+        EXPECT_EQ(res[i].id, result1[i].id);
+        EXPECT_NEAR(res[i].relevance, result1[i].relevance, 0.0001);
+        EXPECT_EQ(res[i].rating, result1[i].rating);
+        EXPECT_EQ(res[i].status, result1[i].status);
+    }
+
+    res = _container->FindTopDocuments("пушистый ухоженный кот", DocumentStatus::BANNED);
+    ASSERT_EQ(1, res.size());
+
+    EXPECT_EQ(res[0].id, result2[0].id);
+    EXPECT_NEAR(res[0].relevance, result2[0].relevance, 0.0001);
+    EXPECT_EQ(res[0].rating, result2[0].rating);
+    EXPECT_EQ(res[0].status, result2[0].status);
+}
+
 TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsWithMinusWordsTest)
 {
     _container->InitializeStopWords(std::set<std::string>{"и", "в", "на"});
     _container->ClearDocuments();
-    _container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"}, std::vector<int>{2, 8, -3});
-    _container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"}, std::vector<int>{3, 7, 2, 7});
-    _container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"}, std::vector<int>{4, 5, -12, 2, 1});
+    _container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"}, DocumentStatus::ACTUAL, std::vector<int>{2, 8, -3});
+    _container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"}, DocumentStatus::ACTUAL, std::vector<int>{3, 7, 2, 7});
+    _container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"}, DocumentStatus::ACTUAL, std::vector<int>{4, 5, -12, 2, 1});
 
-    auto resF = _container->FindDocuments(std::vector<std::string>{"пушистый", "ухоженный", "кот", "-ошейник"});
+    auto resF = _container->FindDocuments(std::vector<std::string>{"пушистый", "ухоженный", "кот", "-ошейник"}, DocumentStatus::ACTUAL);
     std::vector<Document> result{Document{1, 0.650672}, Document{2, 0.274653}};
 
     ASSERT_EQ(result.size(), resF.size());
@@ -179,15 +214,15 @@ TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsWithMinusWor
     }
 }
 
-TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsRating)
+TEST_F(SearchSystemContainerTest, SearchSystemContainerFindDocumentsRatingTest)
 {
     _container->InitializeStopWords(std::set<std::string>{"и", "в", "на"});
     _container->ClearDocuments();
-    _container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"}, std::vector<int>{2, 8, -3});
-    _container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"}, std::vector<int>{3, 7, 2, 7});
-    _container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"}, std::vector<int>{4, 5, -12, 2, 1});
+    _container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"}, DocumentStatus::ACTUAL, std::vector<int>{2, 8, -3});
+    _container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"}, DocumentStatus::ACTUAL, std::vector<int>{3, 7, 2, 7});
+    _container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"}, DocumentStatus::ACTUAL, std::vector<int>{4, 5, -12, 2, 1});
 
-    auto resF = _container->FindTopDocuments(std::vector<std::string>{"пушистый", "ухоженный", "кот"}, 3);
+    auto resF = _container->FindTopDocuments(std::vector<std::string>{"пушистый", "ухоженный", "кот"}, DocumentStatus::ACTUAL, 3);
     std::vector<Document> result{Document{1, 0.650672, 5}, Document{2, 0.274653, 0}, Document{0, 0.101366, 2}};
 
     ASSERT_EQ(result.size(), resF.size());

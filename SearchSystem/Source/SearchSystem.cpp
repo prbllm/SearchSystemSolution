@@ -13,9 +13,10 @@ int main()
 
     container->InitializeStopWords(std::set<std::string>{"и", "в", "на"});
     container->ClearDocuments();
-    container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"}, std::vector<int>{2, 8, -3});
-    container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"}, std::vector<int>{3, 7, 2, 7});
-    container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"}, std::vector<int>{4, 5, -12, 2, 1});
+    container->AddDocument(std::vector<std::string>{"белый", "кот", "и", "модный", "ошейник"}, DocumentStatus::ACTUAL, std::vector<int>{2, 8, -3});
+    container->AddDocument(std::vector<std::string>{"пушистый", "кот", "пушистый", "хвост"}, DocumentStatus::ACTUAL, std::vector<int>{3, 7, 2, 7});
+    container->AddDocument(std::vector<std::string>{"ухоженный", "пёс", "выразительные", "глаза"}, DocumentStatus::ACTUAL, std::vector<int>{4, 5, -12, 2, 1});
+    container->AddDocument(std::vector<std::string>{"ухоженный", "скворец", "евгений"}, DocumentStatus::BANNED, std::vector<int>{9});
 
     //container->InitializeStopWords(Algorithms::Algorithms::ReadLine());
 	
@@ -28,6 +29,6 @@ int main()
     //auto query = Algorithms::Algorithms::SplitIntoWords(Algorithms::Algorithms::ReadLine());
    // auto query = std::vector<std::string>{"cheburashka", "with", "big", "ears", "likes", "oranges"};
    // for (const auto& doc : container->FindTopDocuments(query, 0))
-    for (const auto& doc : container->FindTopDocuments(std::vector<std::string>{"пушистый", "ухоженный", "кот"}, 5))
+    for (const auto& doc : container->FindTopDocuments(std::vector<std::string>{"пушистый", "ухоженный", "кот"}))
         std::cout << "{ document_id = " << doc.id << ", relevance = " << doc.relevance << ", rating = " << doc.rating << " }" << std::endl;
 }

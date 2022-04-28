@@ -5,6 +5,24 @@
 #include <string>
 
 /*!
+ * \brief The DocumentStatus enum Статус документа
+ */
+enum class DocumentStatus
+{
+    /// Актуальный
+    ACTUAL,
+
+    /// Неактуальный
+    IRRELEVANT,
+
+    /// Забаненный
+    BANNED,
+
+    /// Удалённый
+    REMOVED,
+};
+
+/*!
  * \brief The Document struct Описание документа
  */
 struct Document
@@ -23,6 +41,11 @@ struct Document
      * \brief rating рейтинг документа
      */
     int rating{0};
+
+    /*!
+     * \brief status статус документа
+     */
+    DocumentStatus status{DocumentStatus::ACTUAL};
 };
 
 struct Query

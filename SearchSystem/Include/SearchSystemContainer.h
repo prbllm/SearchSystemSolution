@@ -71,9 +71,10 @@ public:
     /*!
      * \brief AddDocument Добавление документа
      * \param docs документы
+     * \param status статус документа
      * \param marks оценки
      */
-    void AddDocument(const std::vector<std::string>& doc, const std::vector<int>& marks);
+    void AddDocument(const std::vector<std::string>& doc, DocumentStatus status, const std::vector<int>& marks);
 
     /*!
      * \brief ClearDocuments Очищение документов
@@ -83,25 +84,37 @@ public:
     /*!
      * \brief FindDocuments Поиск документов
      * \param query поисковая строка
+     * \param status статус документов, по которым ищем
      * \return результат поиска в формате уникальный идентификатор документа - релевантность
      */
-    NO_DISCARD std::vector<Document> FindDocuments(const std::string& query) const;
+    NO_DISCARD std::vector<Document> FindDocuments(const std::string& query, DocumentStatus status) const;
 
     /*!
      * \brief FindDocuments Поиск документов
      * \param query поисковая строка
+     * \param status статус документов, по которым ищем
      * \param all все документы
      * \return результат поиска в формате уникальный идентификатор документа - релевантность
      */
-    NO_DISCARD std::vector<Document> FindDocuments(const std::vector<std::string>& query, bool all = false) const;
+    NO_DISCARD std::vector<Document> FindDocuments(const std::vector<std::string>& query, DocumentStatus status, bool all = false) const;
 
     /*!
      * \brief FindTopDocuments Поиск документов с высокой релевантностью
      * \param query запрос
+     * \param status статус документов, по которым ищем
      * \param count количество документов
      * \return результат поиска в формате уникальный идентификатор документа - релевантность
      */
-    NO_DISCARD std::vector<Document> FindTopDocuments(const std::vector<std::string>& query, size_t count);
+    NO_DISCARD std::vector<Document> FindTopDocuments(const std::vector<std::string>& query, DocumentStatus status = DocumentStatus::ACTUAL, size_t count = 5);
+
+    /*!
+     * \brief FindTopDocuments Поиск документов с высокой релевантностью
+     * \param query запрос
+     * \param status статус документов, по которым ищем
+     * \param count количество документов
+     * \return результат поиска в формате уникальный идентификатор документа - релевантность
+     */
+    NO_DISCARD std::vector<Document> FindTopDocuments(const std::string& query, DocumentStatus status = DocumentStatus::ACTUAL, size_t count = 5);
 
 private:
 

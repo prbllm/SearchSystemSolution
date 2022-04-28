@@ -29,6 +29,11 @@ struct SearchSystemContainer::Data
      * \brief ratings Рейтинги документов
      */
     std::map<size_t, int> ratings;
+
+    /*!
+     * \brief ratings Статусы документов
+     */
+    std::map<size_t, DocumentStatus> statuses;
 };
 
 SearchSystemContainer::SearchSystemContainer()
@@ -53,6 +58,11 @@ SearchSystemContainer::SearchSystemContainer()
                 std::make_pair(
                 3, std::vector<std::string>{"strange", "animal", "big", "ears", "building", "house", "its", "friends"}
                 ));
+
+    _data->statuses.emplace(0, DocumentStatus::ACTUAL);
+    _data->statuses.emplace(1, DocumentStatus::ACTUAL);
+    _data->statuses.emplace(2, DocumentStatus::ACTUAL);
+    _data->statuses.emplace(3, DocumentStatus::ACTUAL);
 }
 
 SearchSystemContainer::~SearchSystemContainer() = default;
@@ -96,7 +106,7 @@ void SearchSystemContainer::InitializeDocuments(Documents &&docs)
     _data->documents = docs;
 }
 
-void SearchSystemContainer::AddDocument(const std::vector<std::string> &doc, const std::vector<int>& marks)
+void SearchSystemContainer::AddDocument(const std::vector<std::string> &doc, DocumentStatus status, const std::vector<int>& marks)
 {
     auto res = doc;
     CheckStopWords(res);
@@ -113,20 +123,22 @@ void SearchSystemContainer::AddDocument(const std::vector<std::string> &doc, con
         _data->ratings.emplace(docToAdd.first, std::round(summ / marks.size()));
     }
 
+    _data->statuses.emplace(docToAdd.first, status);
     _data->documents.emplace_back(std::move(docToAdd));
 }
 
 void SearchSystemContainer::ClearDocuments()
 {
     _data->documents.clear();
+    _data->statuses.clear();
 }
 
-std::vector<Document> SearchSystemContainer::FindDocuments(const std::string &query) const
+std::vector<Document> SearchSystemContainer::FindDocuments(const std::string &query, DocumentStatus status) const
 {
-    return FindDocuments(Algorithms::Algorithms::SplitIntoWords(query));
+    return FindDocuments(Algorithms::Algorithms::SplitIntoWords(query), status);
 }
 
-std::vector<Document> SearchSystemContainer::FindDocuments(const std::vector<std::string> &query, bool all) const
+std::vector<Document> SearchSystemContainer::FindDocuments(const std::vector<std::string> &query, DocumentStatus status, bool all) const
 {
     auto resultQuery = ParseQuery(query);
 
@@ -136,6 +148,16 @@ std::vector<Document> SearchSystemContainer::FindDocuments(const std::vector<std
     int rating{0};
     for (const auto& doc : _data->documents)
     {
+        // проверка статуса документа
+        {
+            auto it = _data->statuses.find(doc.first);
+            if (it == _data->statuses.end())
+                continue;
+            if (static_cast<DocumentStatus>(it->second) != status)
+                continue;
+        }
+
+        // считаем рейтинг
         {
             auto it = _data->ratings.find(doc.first);
             if (it != _data->ratings.end())
@@ -147,7 +169,7 @@ std::vector<Document> SearchSystemContainer::FindDocuments(const std::vector<std
         auto rel = MatchDocument(doc, resultQuery);
         if (all)
         {
-            result.emplace_back(Document{doc.first, rel, rating});
+            result.emplace_back(Document{doc.first, rel, rating, status});
             continue;
         }
 
@@ -161,22 +183,33 @@ std::vector<Document> SearchSystemContainer::FindDocuments(const std::vector<std
         });
         if (it != doc.second.end())
             continue;
-        result.emplace_back(Document{doc.first, rel, rating});
+        result.emplace_back(Document{doc.first, rel, rating, status});
     }
     return result;
 }
 
-std::vector<Document> SearchSystemContainer::FindTopDocuments(const std::vector<std::string> &query, size_t count)
+std::vector<Document> SearchSystemContainer::FindTopDocuments(const std::vector<std::string> &query, DocumentStatus status, size_t count)
 {
-    auto res = FindDocuments(query, true);
+    auto res = FindDocuments(query, status, true);
     std::sort(std::execution::par, res.begin(), res.end(),[](const Document &a, const Document &b)
     {
         return a.relevance > b.relevance;
     });
 
+    if (!count)
+        return std::vector<Document>();
+
     if (count < res.size())
         return std::vector<Document>{res.begin(), res.begin() + count};
     return res;
+}
+
+std::vector<Document> SearchSystemContainer::FindTopDocuments(const std::string &query, DocumentStatus status, size_t count)
+{
+    if (query.empty())
+        return std::vector<Document>();
+
+    return FindTopDocuments(Algorithms::Algorithms::SplitIntoWords(query), status, count);
 }
 
 void SearchSystemContainer::CheckStopWords(std::vector<std::string> &words) const
