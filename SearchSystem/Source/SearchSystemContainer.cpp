@@ -103,7 +103,7 @@ void SearchSystemContainer::AddDocument(const std::vector<std::string> &doc, con
 
     auto docToAdd = std::make_pair(_data->documents.size(), std::move(res));
 
-    if (!marks.size())
+    if (marks.empty())
     {
         _data->ratings.emplace(docToAdd.first, 0);
     }

@@ -68,5 +68,12 @@ namespace Algorithms
          * \return количество
          */
         NO_DISCARD static size_t ContainWordCount(const std::vector<std::string>& data, const std::string& word);
+
+        /*!
+         * \brief ComputeAverage Рассчёт среднего значения
+         * \param data данные
+         * \return среднее значение
+         */
+        NO_DISCARD static int ComputeAverage(const std::vector<int>& data);
     };
 }

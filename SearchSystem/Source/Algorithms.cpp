@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <vector>
 #include <execution>
+#include <cmath>
 
 namespace Algorithms
 {
@@ -98,5 +99,14 @@ namespace Algorithms
         {
             return wordData.find(word) != std::string::npos;
         });
+    }
+
+    int Algorithms::ComputeAverage(const std::vector<int> &data)
+    {
+        if (data.empty())
+            return 0;
+
+        auto summ = std::accumulate(data.begin(), data.end(), 0.);
+        return std::round(summ / data.size());
     }
 }

@@ -54,3 +54,11 @@ TEST(AlgorithmsTests, ContainWordCountTest)
                                                         , "beaver");
     EXPECT_EQ(2, static_cast<int>(res));
 }
+
+TEST(AlgorithmsTests, ComputeAverageTest)
+{
+    EXPECT_EQ(0, Algorithms::Algorithms::ComputeAverage(std::vector<int>()));
+    EXPECT_EQ(2, Algorithms::Algorithms::ComputeAverage(std::vector<int>{2, 8, -3}));
+    EXPECT_EQ(5, Algorithms::Algorithms::ComputeAverage(std::vector<int>{3, 7, 2, 7}));
+    EXPECT_EQ(0, Algorithms::Algorithms::ComputeAverage(std::vector<int>{4, 5, -12, 2, 1}));
+}
